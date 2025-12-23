@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech_info_editor</title>
+    <!-- Quill стили -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .editor-container {
+            padding: 20px;
+        }
+        
+        .title-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            border: 2px solid #eaeaea;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .title-input:focus {
+            border-color: #4b6cb7;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid #eaeaea;
+            margin-bottom: 15px;
+        }
+        
+        .format-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .format-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            min-width: 36px;
+        }
+        
+        .format-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .format-btn.active {
+            background-color: #4b6cb7;
+            color: white;
+            border-color: #4b6cb7;
+        }
+        
+        /* Стили для контейнера загрузки изображений */
+        .image-upload-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        #image-upload {
+            display: none;
+        }
+        
+        .image-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            min-width: 36px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .image-upload-label:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.save {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .action-btn.save:hover {
+            background-color: #218838;
+        }
+        
+        .action-btn.save:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .action-btn.preview {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .action-btn.preview:hover {
+            background-color: #138496;
+        }
+        
+        .action-btn.preview:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .action-btn.cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .action-btn.cancel:hover {
+            background-color: #5a6268;
+        }
+        
+        .action-btn.image {
+            background-color: #ff6b35;
+            color: white;
+        }
+        
+        .action-btn.image:hover {
+            background-color: #e55a2b;
+        }
+        
+        #editor {
+            min-height: 500px;
+            font-size: 16px;
+            line-height: 1.6;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+        }
+        
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        /* Блоки копирования */
+        .copy-block {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .copy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .copy-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            font-weight: 500;
+        }
+        
+        .copy-btn {
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .copy-btn.copied {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .copy-text {
+            font-family: 'Courier New', monospace;
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            border-left: 3px solid #4b6cb7;
+        }
+        
+        .status-message {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-message.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .status-message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .upload-progress {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #4b6cb7;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            padding: 2px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .title-input {
+                font-size: 1.5rem;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Редактор статей</h1>
+            <a href="/" class="back-btn">← На главную</a>
+        </header>
+        
+        <div class="editor-container">
+            <input type="text" id="title" class="title-input" placeholder="Введите заголовок статьи..." required>
+            
+            <div class="status-message" id="status-message"></div>
+            <div class="upload-progress" id="upload-progress">
+                <div class="progress-bar" id="progress-bar"></div>
+                <div class="progress-text" id="progress-text">Загрузка: 0%</div>
+            </div>
+            
+            <div class="controls">
+                <div class="format-buttons">
+                    <button class="format-btn" data-format="bold" title="Жирный">
+                        <b>Ж</b>
+                    </button>
+                    <button class="format-btn" data-format="italic" title="Курсив">
+                        <i>К</i>
+                    </button>
+                    <button class="format-btn" data-format="underline" title="Подчеркивание">
+                        <u>Ч</u>
+                    </button>
+                    <button class="format-btn" data-format="list" value="bullet" title="Маркированный список">
+                        • List
+                    </button>
+                    <button class="format-btn" data-format="list" value="ordered" title="Нумерованный список">
+                        1. List
+                    </button>
+                    <button class="format-btn" data-format="header" value="1" title="Заголовок 1">
+                        H1
+                    </button>
+                    <button class="format-btn" data-format="header" value="2" title="Заголовок 2">
+                        H2
+                    </button>
+                    <button class="format-btn" id="image-url-btn" title="Вставить изображение по URL">
+                        🖼️ URL
+                    </button>
+                    
+                    <!-- Кнопка для загрузки изображения с компьютера -->
+                    <div class="image-upload-container">
+                        <input type="file" id="image-upload" accept="image/*">
+                        <label for="image-upload" class="image-upload-label" title="Загрузить изображение с компьютера">
+                            📁 Файл
+                        </label>
+                    </div>
+                    
+                    <!-- Кнопка для создания блоков копирования -->
+                    <button class="format-btn" id="block-btn" title="Преобразовать [block] теги в интерактивные блоки">
+                        📋 Блоки
+                    </button>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn cancel" id="cancel-btn">Отмена</button>
+                    <button class="action-btn preview" id="preview-btn" disabled>Предпросмотр</button>
+                    <button class="action-btn save" id="save-btn" disabled>Сохранить статью</button>
+                </div>
+            </div>
+            
+            <div id="editor">
+                <p>Начните писать свою статью здесь...</p>
+                <p>Используйте теги <code>[block]ваш текст[/block]</code> для создания копируемых блоков.</p>
+                <p>Загружайте изображения с помощью кнопки "Файл" или вставьте URL изображения.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для вставки изображения по URL -->
+    <div class="image-modal" id="image-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background-color: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
+            <h3 style="margin-bottom: 20px;">Вставить изображение по URL</h3>
+            <input type="text" id="image-url-input" placeholder="Введите URL изображения..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="action-btn cancel" id="cancel-image-url">Отмена</button>
+                <button class="action-btn save" id="insert-image-url">Вставить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quill библиотека -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    
+    <script>
+        // Получаем ID статьи из URL (если редактирование)
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        let isEditMode = !!postId;
+        let currentPostId = postId;
+        let quill;
+
+        // Проверяем авторизацию
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/me', { 
+                    credentials: 'same-origin' 
+                });
+                const data = await response.json();
+                
+                if (!data.user) {
+                    window.location.href = '/login.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                window.location.href = '/login.html';
+                return false;
+            }
+        }
+
+        // Показать сообщение
+        function showMessage(text, type = 'info') {
+            const messageEl = document.getElementById('status-message');
+            messageEl.textContent = text;
+            messageEl.className = `status-message ${type}`;
+            messageEl.style.display = 'block';
+            
+            // Автоматическое скрытие для success/info сообщений
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Показать прогресс загрузки
+        function showUploadProgress(percent) {
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const progressContainer = document.getElementById('upload-progress');
+            
+            progressBar.style.width = `${percent}%`;
+            progressText.textContent = `Загрузка: ${percent}%`;
+            
+            if (percent > 0 && percent < 100) {
+                progressContainer.style.display = 'block';
+            } else if (percent === 100) {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    progressText.textContent = 'Загрузка: 0%';
+                }, 1000);
+            }
+        }
+
+        // Инициализация редактора
+        async function initEditor() {
+            const auth = await checkAuth();
+            if (!auth) return;
+
+            // Инициализация Quill
+            quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: false
+                }
+            });
+
+            // Загрузка статьи, если редактируем
+            if (isEditMode) {
+                try {
+                    showMessage('Загрузка статьи...', 'info');
+                    await loadPost(currentPostId);
+                    showMessage('Статья загружена', 'success');
+                } catch (error) {
+                    showMessage('Ошибка загрузки статьи', 'error');
+                }
+            }
+
+            // Включаем кнопки сохранения и предпросмотра
+            document.getElementById('save-btn').disabled = false;
+            document.getElementById('preview-btn').disabled = false;
+
+            // Обработчики кнопок форматирования
+            document.querySelectorAll('.format-btn[data-format]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const format = this.dataset.format;
+                    const value = this.value || true;
+                    
+                    if (format === 'bold' || format === 'italic' || format === 'underline') {
+                        quill.format(format, value);
+                    } else if (format === 'list') {
+                        quill.format('list', value);
+                    } else if (format === 'header') {
+                        quill.format('header', parseInt(value));
+                    }
+                });
+            });
+
+            // Кнопка вставки изображения по URL
+            document.getElementById('image-url-btn').addEventListener('click', function() {
+                document.getElementById('image-modal').style.display = 'flex';
+                document.getElementById('image-url-input').focus();
+            });
+
+            // Закрытие модального окна URL
+            document.getElementById('cancel-image-url').addEventListener('click', function() {
+                document.getElementById('image-modal').style.display = 'none';
+                document.getElementById('image-url-input').value = '';
+            });
+
+            // Вставка изображения по URL
+            document.getElementById('insert-image-url').addEventListener('click', function() {
+                const url = document.getElementById('image-url-input').value.trim();
+                if (!url) {
+                    showMessage('Введите URL изображения', 'warning');
+                    return;
+                }
+
+                const range = quill.getSelection();
+                const position = range ? range.index : quill.getLength();
+                
+                quill.insertEmbed(position, 'image', url);
+                document.getElementById('image-modal').style.display = 'none';
+                document.getElementById('image-url-input').value = '';
+                showMessage('Изображение вставлено', 'success');
+            });
+
+            // Загрузка изображения с компьютера
+            document.getElementById('image-upload').addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                
+                if (!file) return;
+
+                // Проверяем тип файла
+                if (!file.type.match('image.*')) {
+                    showMessage('Пожалуйста, выберите файл изображения (JPG, PNG, GIF и т.д.)', 'error');
+                    this.value = '';
+                    return;
+                }
+
+                // Проверяем размер файла (максимум 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    showMessage('Размер файла не должен превышать 10MB', 'error');
+                    this.value = '';
+                    return;
+                }
+
+                try {
+                    // Показываем прогресс загрузки
+                    showUploadProgress(10);
+
+                    // Получаем текущую позицию курсора
+                    const range = quill.getSelection();
+                    const position = range ? range.index : quill.getLength();
+
+                    // Вставляем временный плейсхолдер
+                    quill.insertText(position, '[Загрузка изображения...]', { color: '#999' });
+                    
+                    // Загружаем изображение
+                    showUploadProgress(30);
+                    const imageUrl = await uploadLocalImage(file);
+                    
+                    if (imageUrl) {
+                        // Удаляем плейсхолдер
+                        quill.deleteText(position, 24);
+                        
+                        // Вставляем изображение
+                        quill.insertEmbed(position, 'image', imageUrl);
+                        showUploadProgress(100);
+                        showMessage('Изображение загружено и вставлено', 'success');
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки изображения:', error);
+                    showMessage('Ошибка загрузки изображения: ' + error.message, 'error');
+                } finally {
+                    // Сбрасываем значение input
+                    this.value = '';
+                }
+            });
+
+            // Кнопка преобразования блоков
+            document.getElementById('block-btn').addEventListener('click', function() {
+                const content = quill.root.innerHTML;
+                
+                // Проверяем, есть ли теги [block]
+                if (!content.includes('[block]') || !content.includes('[/block]')) {
+                    showMessage('В тексте не найдено тегов [block]...[/block]', 'warning');
+                    return;
+                }
+                
+                // Подсветка тегов в редакторе
+                const newContent = content.replace(
+                    /\[block\](.*?)\[\/block\]/g, 
+                    '<span style="background-color: #fff3cd; padding: 2px 4px; border-radius: 3px; border: 1px solid #ffeaa7;">[block]$1[/block]</span>'
+                );
+                
+                quill.root.innerHTML = newContent;
+                showMessage('Теги [block] подсвечены. Они будут преобразованы при сохранении.', 'info');
+            });
+
+            // Сохранение статьи
+            document.getElementById('save-btn').addEventListener('click', savePost);
+
+            // Предпросмотр
+            document.getElementById('preview-btn').addEventListener('click', function() {
+                const title = document.getElementById('title').value;
+                let content = quill.root.innerHTML;
+                
+                if (!title.trim()) {
+                    showMessage('Введите заголовок статьи', 'warning');
+                    return;
+                }
+                
+                // Сохраняем в localStorage для предпросмотра
+                localStorage.setItem('preview_title', title);
+                localStorage.setItem('preview_content', content);
+                
+                // Открываем предпросмотр в новом окне
+                window.open('/preview.html', '_blank');
+            });
+
+            // Отмена
+            document.getElementById('cancel-btn').addEventListener('click', function() {
+                if (confirm('Вы уверены? Все несохраненные изменения будут потеряны.')) {
+                    window.location.href = '/';
+                }
+            });
+
+            // Автосохранение каждые 30 секунд
+            let autoSaveTimer;
+            let hasUnsavedChanges = false;
+            
+            quill.on('text-change', function() {
+                hasUnsavedChanges = true;
+                
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(() => {
+                    if (hasUnsavedChanges && document.getElementById('title').value.trim()) {
+                        autoSaveDraft();
+                    }
+                }, 30000); // 30 секунд
+            });
+
+            // Автосохранение черновика
+            function autoSaveDraft() {
+                const title = document.getElementById('title').value.trim();
+                const content = quill.root.innerHTML;
+                
+                if (!title) return;
+                
+                localStorage.setItem('article_draft', JSON.stringify({
+                    title: title,
+                    content: content,
+                    timestamp: new Date().toISOString()
+                }));
+                
+                console.log('Черновик автосохранен');
+            }
+
+            // Проверка наличия черновика
+            const draft = localStorage.getItem('article_draft');
+            if (draft && !isEditMode) {
+                if (confirm('Найден несохраненный черновик. Загрузить его?')) {
+                    try {
+                        const draftData = JSON.parse(draft);
+                        document.getElementById('title').value = draftData.title;
+                        quill.root.innerHTML = draftData.content;
+                        showMessage('Черновик загружен', 'info');
+                    } catch (e) {
+                        console.error('Ошибка загрузки черновика:', e);
+                    }
+                }
+            }
+
+            // Запрос подтверждения при закрытии страницы
+            window.addEventListener('beforeunload', function(e) {
+                if (hasUnsavedChanges) {
+                    e.preventDefault();
+                    e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите покинуть страницу?';
+                }
+            });
+        }
+
+        // Загрузка статьи
+        async function loadPost(id) {
+            try {
+                const response = await fetch(`/api/post/${id}`);
+                if (!response.ok) {
+                    throw new Error('Статья не найдена');
+                }
+                
+                const post = await response.json();
+                
+                if (post.error) {
+                    throw new Error(post.error);
+                }
+                
+                document.getElementById('title').value = post.title || '';
+                document.querySelector('h1').textContent = 'Редактирование статьи';
+                quill.root.innerHTML = post.content || '';
+                
+            } catch (error) {
+                console.error('Ошибка загрузки статьи:', error);
+                throw error;
+            }
+        }
+
+        // Загрузка локального изображения на сервер
+        async function uploadLocalImage(file) {
+            // Проверяем, есть ли у статьи ID
+            if (!currentPostId) {
+                // Сначала создаем черновик статьи
+                const title = document.getElementById('title').value.trim();
+                const content = quill.root.innerHTML;
+                
+                if (!title) {
+                    throw new Error('Сначала введите заголовок статьи');
+                }
+                
+                showUploadProgress(40);
+                
+                // Создаем статью с временным контентом
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ 
+                        title: title, 
+                        content: '<p>Загрузка изображения...</p>' 
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка создания статьи');
+                }
+                
+                const result = await response.json();
+                currentPostId = result.id;
+                isEditMode = true;
+                
+                // Обновляем URL
+                window.history.pushState({}, '', `/editor.html?id=${currentPostId}`);
+                
+                showUploadProgress(60);
+            }
+            
+            // Загружаем изображение
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const uploadResponse = await fetch(`/api/upload-image/${currentPostId}`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData
+            });
+            
+            if (!uploadResponse.ok) {
+                const error = await uploadResponse.json();
+                throw new Error(error.error || 'Ошибка загрузки изображения');
+            }
+            
+            const uploadResult = await uploadResponse.json();
+            return uploadResult.url;
+        }
+
+        // Сохранение статьи
+        async function savePost() {
+            const title = document.getElementById('title').value.trim();
+            let content = quill.root.innerHTML;
+            
+            if (!title) {
+                showMessage('Введите заголовок статьи', 'error');
+                document.getElementById('title').focus();
+                return;
+            }
+            
+            if (!content || content === '<p><br></p>') {
+                showMessage('Введите содержание статьи', 'error');
+                return;
+            }
+            
+            // Преобразуем теги [block] в HTML блоки копирования
+            content = processBlockTags(content);
+            
+            try {
+                // Показываем статус сохранения
+                const saveBtn = document.getElementById('save-btn');
+                const originalText = saveBtn.textContent;
+                saveBtn.textContent = 'Сохранение...';
+                saveBtn.disabled = true;
+                
+                const url = isEditMode 
+                    ? `/api/post/${currentPostId}` 
+                    : '/api/posts';
+                
+                const method = isEditMode ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ title, content })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    if (!isEditMode) {
+                        currentPostId = result.id;
+                        isEditMode = true;
+                        window.history.pushState({}, '', `/editor.html?id=${currentPostId}`);
+                    }
+                    
+                    // Очищаем черновик
+                    localStorage.removeItem('article_draft');
+                    
+                    showMessage(
+                        isEditMode 
+                            ? 'Статья успешно обновлена!' 
+                            : 'Статья успешно создана!',
+                        'success'
+                    );
+                    
+                    // Обновляем кнопку
+                    saveBtn.textContent = originalText;
+                    saveBtn.disabled = false;
+                    
+                    // Обновляем статус изменений
+                    hasUnsavedChanges = false;
+                    
+                    // Перенаправляем на статью через 1.5 секунды
+                    setTimeout(() => {
+                        window.location.href = `/post.html?id=${currentPostId}`;
+                    }, 1500);
+                    
+                } else {
+                    throw new Error(result.error || 'Ошибка сохранения');
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения статьи:', error);
+                showMessage(error.message, 'error');
+                
+                // Восстанавливаем кнопку
+                const saveBtn = document.getElementById('save-btn');
+                saveBtn.textContent = 'Сохранить статью';
+                saveBtn.disabled = false;
+            }
+        }
+
+        // Обработка тегов [block] для сохранения
+        function processBlockTags(content) {
+            let blockCounter = 0;
+            
+            // Регулярное выражение для поиска тегов [block]...[/block]
+            const blockRegex = /\[block\](.*?)\[\/block\]/gs;
+            
+            // Заменяем теги на HTML блоки копирования
+            const processedContent = content.replace(blockRegex, function(match, blockContent) {
+                blockCounter++;
+                const blockId = `block-${Date.now()}-${blockCounter}`;
+                
+                return `
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <div class="copy-label">Блок для копирования #${blockCounter}</div>
+                            <button class="copy-btn" onclick="copyText('${blockId}')" data-block="${blockId}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Копировать
+                            </button>
+                        </div>
+                        <div class="copy-text" id="${blockId}">${blockContent.trim()}</div>
+                    </div>
+                `;
+            });
+            
+            if (blockCounter > 0) {
+                showMessage(`Преобразовано ${blockCounter} блоков для копирования`, 'info');
+            }
+            
+            return processedContent;
+        }
+
+        // Функция копирования текста (для блоков)
+        window.copyText = async function(blockId) {
+            const textElement = document.getElementById(blockId);
+            const button = document.querySelector(`[data-block="${blockId}"]`);
+            
+            if (!textElement || !button) return;
+            
+            try {
+                await navigator.clipboard.writeText(textElement.textContent);
+                
+                // Меняем вид кнопки
+                const originalHTML = button.innerHTML;
+                button.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Скопировано!
+                `;
+                button.classList.add('copied');
+                
+                // Возвращаем исходный вид через 2 секунды
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('copied');
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Ошибка копирования:', err);
+                
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = textElement.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    alert('Текст скопирован!');
+                } catch (e) {
+                    alert('Не удалось скопировать текст');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        };
+
+        // Обработка Enter в поле заголовка (для быстрого сохранения)
+        document.getElementById('title').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                quill.focus();
+            }
+        });
+
+        // Закрытие модального окна при клике вне его
+        document.getElementById('image-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+                document.getElementById('image-url-input').value = '';
+            }
+        });
+
+        // Вставка изображения по URL при нажатии Enter
+        document.getElementById('image-url-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('insert-image-url').click();
+            }
+        });
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', initEditor);
+    </script>
+</body>
+</html>

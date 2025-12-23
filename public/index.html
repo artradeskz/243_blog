@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech_info</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+        }
+        
+        h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: white;
+            color: #4b6cb7;
+        }
+        
+        .btn-primary:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .new-post-btn {
+            background-color: #28a745;
+            color: white;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .new-post-btn:hover {
+            background-color: #218838;
+        }
+        
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .post-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+        
+        .post-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .post-title a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        
+        .post-title a:hover {
+            color: #4b6cb7;
+        }
+        
+        .post-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .post-excerpt {
+            color: #888;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .read-more {
+            color: #4b6cb7;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .edit-btn {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .no-posts {
+            text-align: center;
+            padding: 60px 40px;
+            color: #666;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .no-posts h3 {
+            color: #4b6cb7;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .no-posts p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        
+        .create-first-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .create-first-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 40px;
+            color: #666;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4b6cb7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #dc3545;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .error-message h3 {
+            margin-bottom: 10px;
+        }
+        
+        .retry-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .post-actions {
+                flex-wrap: wrap;
+            }
+            
+            .post-card {
+                padding: 20px;
+            }
+            
+            .post-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1><a href="/">Мой блог</a></h1>
+            <div class="auth-buttons" id="auth-buttons">
+                <!-- Будет заполнено JavaScript -->
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="admin-controls" style="display: none;">
+            <a href="/editor.html" class="btn new-post-btn">+ Новая статья</a>
+        </div>
+        
+        <div id="loading-state" class="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Загрузка статей...</p>
+        </div>
+        
+        <div id="error-state" class="error-message" style="display: none;">
+            <h3>Ошибка загрузки статей</h3>
+            <p>Не удалось загрузить список статей</p>
+            <button class="retry-btn" onclick="loadPosts()">Повторить</button>
+        </div>
+        
+        <div class="posts-list" id="posts-list">
+            <!-- Статьи будут загружены здесь -->
+        </div>
+    </div>
+
+    <script>
+        // Проверка авторизации
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/me', { credentials: 'same-origin' });
+                const data = await response.json();
+                
+                const authButtons = document.getElementById('auth-buttons');
+                const adminControls = document.getElementById('admin-controls');
+                
+                if (data.user) {
+                    authButtons.innerHTML = `
+                        <span style="margin-right: 10px; display: flex; align-items: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                            ${data.user.username}
+                        </span>
+                        <button onclick="logout()" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                            </svg>
+                            Выйти
+                        </button>
+                    `;
+                    adminControls.style.display = 'block';
+                } else {
+                    authButtons.innerHTML = `
+                        <a href="/login.html" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                <path d="M10 16l5-4-5-4v8z"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            </svg>
+                            Вход
+                        </a>
+                    `;
+                    adminControls.style.display = 'none';
+                }
+                
+                return data.user;
+            } catch (error) {
+                console.error('Ошибка проверки авторизации:', error);
+                return null;
+            }
+        }
+        
+        // Загрузка статей (только заголовки и метаданные)
+        async function loadPosts() {
+            const postsList = document.getElementById('posts-list');
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            
+            // Показываем состояние загрузки
+            postsList.innerHTML = '';
+            loadingState.style.display = 'block';
+            errorState.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/posts');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const posts = await response.json();
+                
+                // Скрываем состояние загрузки
+                loadingState.style.display = 'none';
+                
+                if (!posts || posts.length === 0) {
+                    postsList.innerHTML = `
+                        <div class="no-posts">
+                            <h3>Пока нет статей</h3>
+                            <p>Будьте первым, кто опубликует статью!</p>
+                            <a href="/editor.html" class="create-first-btn">Создать первую статью</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const user = await checkAuth();
+                const isAdmin = !!user;
+                
+                // Форматируем даты и создаем карточки статей
+                postsList.innerHTML = posts.map(post => {
+                    const date = new Date(post.created_at);
+                    const formattedDate = date.toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    // Отображаем время, если статья создана сегодня
+                    let timeInfo = '';
+                    const today = new Date();
+                    if (date.toDateString() === today.toDateString()) {
+                        timeInfo = ` в ${date.toLocaleTimeString('ru-RU', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}`;
+                    }
+                    
+                    // Вместо контента показываем просто сообщение
+                    const excerpt = 'Нажмите "Читать полностью", чтобы открыть статью';
+                    
+                    return `
+                        <div class="post-card" data-id="${post.id}">
+                            <h2 class="post-title">
+                                <a href="/post.html?id=${post.id}">${post.title || 'Без заголовка'}</a>
+                            </h2>
+                            <div class="post-meta">
+                                <span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 5px;">
+                                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                                    </svg>
+                                    Опубликовано: ${formattedDate}${timeInfo}
+                                </span>
+                            </div>
+                            <div class="post-excerpt">
+                                ${excerpt}
+                            </div>
+                            <div class="post-actions">
+                                <a href="/post.html?id=${post.id}" class="read-more">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 6px;">
+                                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                    </svg>
+                                    Читать полностью →
+                                </a>
+                                ${isAdmin ? `
+                                    <a href="/editor.html?id=${post.id}" class="edit-btn">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                        </svg>
+                                        Редактировать
+                                    </a>
+                                    <button onclick="deletePost(${post.id})" class="delete-btn">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                        Удалить
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки статей:', error);
+                
+                // Скрываем состояние загрузки и показываем ошибку
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                
+                // Показываем пустой список
+                postsList.innerHTML = '';
+            }
+        }
+        
+        // Удаление статьи
+        async function deletePost(id) {
+            if (!confirm('Вы уверены, что хотите удалить эту статью?\n\nЭто действие нельзя отменить.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/post/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+                
+                if (response.ok) {
+                    // Показываем сообщение об успехе
+                    alert('Статья успешно удалена');
+                    // Перезагружаем список статей
+                    loadPosts();
+                } else {
+                    const error = await response.json();
+                    alert(`Ошибка удаления статьи: ${error.error || 'Неизвестная ошибка'}`);
+                }
+            } catch (error) {
+                console.error('Ошибка удаления статьи:', error);
+                alert('Ошибка удаления статьи. Проверьте подключение к интернету.');
+            }
+        }
+        
+        // Выход
+        async function logout() {
+            if (!confirm('Вы уверены, что хотите выйти?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                
+                if (response.ok) {
+                    // Перезагружаем страницу
+                    window.location.reload();
+                } else {
+                    alert('Ошибка выхода из системы');
+                }
+            } catch (error) {
+                console.error('Ошибка выхода:', error);
+                alert('Ошибка выхода из системы');
+            }
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadPosts();
+        });
+    </script>
+</body>
+</html>

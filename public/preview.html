@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Предпросмотр статьи</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .copy-block {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .copy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .copy-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .copy-text {
+            font-family: 'Courier New', monospace;
+            background-color: white;
+            padding: 10px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="preview-title"></h1>
+        <div class="article-meta">
+            <span>Предпросмотр статьи</span>
+        </div>
+        <div class="article-content" id="preview-content"></div>
+        <a href="javascript:history.back()" class="back-btn">← Вернуться к редактированию</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = localStorage.getItem('preview_title') || 'Заголовок статьи';
+            const content = localStorage.getItem('preview_content') || '<p>Содержание статьи...</p>';
+            
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('preview-content').innerHTML = content;
+            
+            // Функция для обработки блоков копирования
+            function processCopyBlocks() {
+                const contentDiv = document.getElementById('preview-content');
+                const text = contentDiv.innerHTML;
+                
+                // Регулярное выражение для поиска [block]...[/block]
+                const blockRegex = /\[block\](.*?)\[\/block\]/g;
+                
+                // Заменяем [block] на HTML для копирования
+                const newHtml = text.replace(blockRegex, function(match, content) {
+                    const blockId = Date.now() + Math.random();
+                    return `
+                        <div class="copy-block">
+                            <div class="copy-header">
+                                <span>Блок для копирования</span>
+                                <button class="copy-btn" onclick="copyBlockText('${blockId}')">Копировать</button>
+                            </div>
+                            <div class="copy-text" id="block-${blockId}">${content.trim()}</div>
+                        </div>
+                    `;
+                });
+                
+                contentDiv.innerHTML = newHtml;
+            }
+            
+            processCopyBlocks();
+        });
+        
+        function copyBlockText(blockId) {
+            const textElement = document.getElementById(`block-${blockId}`);
+            const text = textElement.textContent;
+            
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    alert('Текст скопирован!');
+                })
+                .catch(err => {
+                    console.error('Ошибка копирования:', err);
+                    alert('Не удалось скопировать текст');
+                });
+        }
+    </script>
+</body>
+</html>
